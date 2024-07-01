@@ -1,23 +1,23 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
-import axios from 'axios';
+import React from "react";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import axios from "axios";
 
-const BACKEND_URL = 'exp://192.168.0.128:8081'; // Substitua pelo endereço IP do seu backend
+const BACKEND_URL = "exp://192.168.0.128:8081"; // Substitua pelo endereço IP do seu backend
 
 const HomeScreen = () => {
   const [recording, setRecording] = React.useState(null);
   const [recordings, setRecordings] = React.useState([]);
   const [transcriptions, setTranscriptions] = React.useState([]);
-  
+
   async function startRecording() {
     try {
       const perm = await Audio.requestPermissionsAsync();
       if (perm.status === "granted") {
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: true,
-          playsInSilentModeIOS: true
+          playsInSilentModeIOS: true,
         });
         const { recording } = await Audio.Recording.createAsync({
           isMeteringEnabled: true,
@@ -31,14 +31,14 @@ const HomeScreen = () => {
         setRecording(recording);
       }
     } catch (err) {
-      console.error('Failed to start recording', err);
+      console.error("Failed to start recording", err);
     }
   }
 
   async function stopRecording() {
     try {
       if (!recording) {
-        console.warn('Recording is undefined. Skipping stopRecording.');
+        console.warn("Recording is undefined. Skipping stopRecording.");
         return;
       }
 
@@ -47,40 +47,42 @@ const HomeScreen = () => {
       const { sound, status } = await recording.createNewLoadedSoundAsync();
       const fileUri = recording.getURI();
 
-      const allRecordings = [...recordings, {
-        sound: sound,
-        duration: getDurationFormatted(status.durationMillis),
-        file: fileUri
-      }];
+      const allRecordings = [
+        ...recordings,
+        {
+          sound: sound,
+          duration: getDurationFormatted(status.durationMillis),
+          file: fileUri,
+        },
+      ];
 
       setRecordings(allRecordings);
       transcribeAudio(fileUri);
       setRecording(undefined);
     } catch (error) {
-      console.error('Error stopping recording or sending audio:', error);
+      console.error("Error stopping recording or sending audio:", error);
     }
   }
 
   async function transcribeAudio(uri) {
     try {
       const formData = new FormData();
-      formData.append('audio', {
+      formData.append("audio", {
         uri: uri,
-        type: 'audio/wav',
-        name: 'audio.wav'
+        type: "audio/wav",
+        name: "audio.wav",
       });
 
       const response = await axios.post(`${BACKEND_URL}/transcribe`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       const transcription = response.data.transcription;
       setTranscriptions([...transcriptions, transcription]);
-
     } catch (error) {
-      console.error('Error transcribing audio:', error);
+      console.error("Error transcribing audio:", error);
     }
   }
 
@@ -94,10 +96,6 @@ const HomeScreen = () => {
     return recordings.map((recordingLine, index) => {
       return (
         <View key={index} style={styles.row}>
-          <Image
-                source={require('./assets/transparente-fundo-branco.png')}
-                style={{ width: 200, height: 200, top: 20, position: "absolute" }}
-              />
           <Text style={styles.fill}>
             Recording #{index + 1} | {recordingLine.duration}
           </Text>
@@ -119,15 +117,16 @@ const HomeScreen = () => {
   }
 
   return (
-
     <View style={styles.container}>
-   
       <TouchableOpacity
-        style={[styles.button, recording ? styles.stopButton : styles.startButton]}
+        style={[
+          styles.button,
+          recording ? styles.stopButton : styles.startButton,
+        ]}
         onPress={recording ? stopRecording : startRecording}
       >
         <Text style={styles.buttonText}>
-          {recording ? 'Stop Recording' : 'Start Recording'}
+          {recording ? "Stop Recording" : "Start Recording"}
         </Text>
       </TouchableOpacity>
 
@@ -138,72 +137,70 @@ const HomeScreen = () => {
           style={[styles.button, styles.clearButton]}
           onPress={clearRecordings}
         >
-          <Text style={styles.buttonText}>
-            Clear Recordings
-          </Text>
+          <Text style={styles.buttonText}>Clear Recordings</Text>
         </TouchableOpacity>
       )}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 10,
   },
   fill: {
     top: 130,
-    position:"relative",
+    position: "relative",
     flex: 1,
     marginHorizontal: 50,
   },
   transcription: {
     flex: 1,
     marginLeft: 15,
-    color: 'blue',
+    color: "blue",
   },
   button: {
     top: 150,
-    position:"absolute",
+    position: "absolute",
     padding: 15,
     borderRadius: 80,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 0,
     width: 221,
   },
   startButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
   },
   stopButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: "#F44336",
   },
   clearButton: {
     top: 100,
-    position:"absolute",
-    backgroundColor: '#FF9800',
+    position: "absolute",
+    backgroundColor: "#FF9800",
   },
   playButton: {
     top: 130,
-    position:"relative",
-    backgroundColor: '#2196F3',
+    position: "relative",
+    backgroundColor: "#2196F3",
     padding: 10,
     borderRadius: 30,
     marginLeft: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
-  }
+    fontWeight: "bold",
+  },
 });
 
 export default HomeScreen;
