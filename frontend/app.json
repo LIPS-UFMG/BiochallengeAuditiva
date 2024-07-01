@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Biochallenge",
+    "slug": "Biochallenge",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon-meEscuta.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/icon-meEscuta.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E2C13B"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-meEscuta.png",
+        "backgroundColor": "#E2C13B"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icon-meEscuta.png"
+    }
+  }
+}
