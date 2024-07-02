@@ -47,8 +47,8 @@ const IPhone1314Dispositivos = () => {
       </View>
       <Image
         style={styles.transparenteFundoBranco1Icon}
-        resizeMode="cover"
-        source="transparente-fundo-branco 1.png"
+        
+        source="assets/transparente-fundo-branco.png"
       />
       <View style={[styles.buttonSecondary, styles.buttonSecondaryFlexBox]}>
         <Image
@@ -71,7 +71,7 @@ const IPhone1314Dispositivos = () => {
           styles.dispositivosConectadosTypo,
         ]}
       >
-        Dispositivos conectados:
+      Dispositivos conectados:
       </Text>
       <View
         style={[styles.iphone1314DispositivosChild, styles.iphone1314Layout]}
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: -0.5,
     },
-    backgroundColor: "#fff",
+    backgroundColor: "#aaa",
   },
   tabItemPosition: {
     opacity: 0.5,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   dispositivosConectadosTypo: {
-    textAlign: "left",
+    textAlign: "center",
     fontFamily: "Montserrat-Medium",
     color: "#000",
     fontWeight: "500",
@@ -203,13 +203,13 @@ const styles = StyleSheet.create({
   },
   bottomTabBar: {
     top: 751,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowColor: "#aaaaa",
     shadowRadius: 0,
     elevation: 0,
     width: 390,
     height: 93,
     left: 0,
-    shadowOpacity: 1,
+    shadowOpacity: 0,
     shadowOffset: {
       width: 0,
       height: -0.5,
@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
   },
   buttonSecondaryChild: {
     width: 13,
+    color: "#aaaa",
     height: 13,
   },
   conectarNovoDispositivo: {
@@ -233,22 +234,22 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   buttonSecondary: {
-    top: 100,
+    top: 150,
     left: 46,
     elevation: 40,
-    borderRadius: 45,
+    borderRadius: 150,
     width: 298,
     height: 57,
     flexDirection: "row",
     justifyContent: "center",
     paddingHorizontal: 0,
     paddingVertical: 14,
-    shadowOpacity: 1,
+    shadowOpacity: 0,
     shadowOffset: {
       width: 0,
       height: -0.5,
     },
-    backgroundColor: "#32CD32",
+    backgroundColor: "#37de00",
   },
   dispositivosConectados: {
     top: 225,

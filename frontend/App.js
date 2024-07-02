@@ -13,7 +13,7 @@ export default function Navigation() {
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen
-          name="Home"
+          name="Início"
           component={HomeScreen}
           options={{
             tabBarIcon: ({ focused }) => (
