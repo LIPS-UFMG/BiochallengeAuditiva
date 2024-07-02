@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button } from "react-native";
-import { BleManager, Device } from "@react-native-ble/plx";
+import { BleManager, Device } from "react-native-ble-plx";
 
 const DeviceScreen = () => {
-  const [manager, setManager] = (useState < BleManager) | (null > null);
-  const [device, setDevice] = (useState < Device) | (null > null);
+  const [manager, setManager] = useState(null);
+  const [device, setDevice] = useState(null);
 
   useEffect(() => {
     const bleManager = new BleManager();
@@ -17,33 +17,29 @@ const DeviceScreen = () => {
 
   const scanAndConnectToDevice = async () => {
     try {
-      const devices = await manager?.startDeviceScan(
-        null,
-        null,
-        (error, scannedDevice) => {
-          if (error) {
-            console.error("Error scanning for devices:", error.message);
-            return;
-          }
-
-          if (scannedDevice?.name === "MeuDispositivoBLE") {
-            // Substitua com o nome do seu dispositivo
-            manager?.stopDeviceScan();
-            scannedDevice
-              .connect()
-              .then((connectedDevice) => {
-                console.log("Connected to device:", connectedDevice.name);
-                setDevice(connectedDevice);
-              })
-              .catch((connectError) => {
-                console.error(
-                  "Failed to connect to device:",
-                  connectError.message
-                );
-              });
-          }
+      manager?.startDeviceScan(null, null, (error, scannedDevice) => {
+        if (error) {
+          console.error("Error scanning for devices:", error.message);
+          return;
         }
-      );
+
+        if (scannedDevice?.name === "MeuDispositivoBLE") {
+          // Substitua com o nome do seu dispositivo
+          manager?.stopDeviceScan();
+          scannedDevice
+            .connect()
+            .then((connectedDevice) => {
+              console.log("Connected to device:", connectedDevice.name);
+              setDevice(connectedDevice);
+            })
+            .catch((connectError) => {
+              console.error(
+                "Failed to connect to device:",
+                connectError.message
+              );
+            });
+        }
+      });
 
       setTimeout(() => {
         manager?.stopDeviceScan();
