@@ -82,5 +82,5 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://${results['Wi-Fi']}:${port}`);
+  console.log(`Server is running on http://${results['Wi-Fi 4']}:${port}`);
 });
