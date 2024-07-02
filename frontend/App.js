@@ -3,8 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Image } from 'react-native';
 import HomeScreen from './components/HomeScreen';
-import AlertsScreen from './components/AlertsScreen';
 import SettingsScreen from './components/SettingsScreen';
+import DevicesScreen from './components/DevicesScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,7 +26,7 @@ export default function Navigation() {
         />
         <Tab.Screen
           name="Dispositivos"
-          component={AlertsScreen}
+          component={DevicesScreen}
           options={{
             tabBarIcon: ({ focused }) => (
               <Image
