@@ -1,88 +1,74 @@
 import * as React from "react";
-import {Text, StyleSheet, View} from "react-native";
+import {Text, StyleSheet, Image, View} from "react-native";
 
 const IPhone1314Configuraes = () => {
   	
   	return (
     		<View style={styles.iphone1314Configuraes}>
-      			<View style={[styles.button, styles.buttonFlexBox]}>
-        				<View style={[styles.stateLayer, styles.buttonFlexBox]}>
-          					<Text style={styles.labelText}>{`Aa | Texto                      >`}</Text>
-        				</View>
-      			</View>
-      			<View style={[styles.button1, styles.buttonFlexBox]}>
-        				<View style={[styles.stateLayer, styles.buttonFlexBox]}>
-          					<Text style={styles.labelText}>{`      | Contraste              >`}</Text>
-        				</View>
-      			</View>
-      			<View style={[styles.button2, styles.buttonFlexBox]}>
-        				<View style={[styles.stateLayer, styles.buttonFlexBox]}>
-          					<Text style={styles.labelText}>{`   i  | Sobre o app           >`}</Text>
-        				</View>
-      			</View>
+      			<Text style={styles.olSomosO}>{`olá, somos o MeEscuta! `}</Text>
+      			<Text style={[styles.verso10, styles.verso10Typo]}>versão 1.0</Text>
+      			<Image style={styles.transparenteFundoBranco1Icon} source={require('./assets/transparente-fundo-branco.png')} />
+      			<Text style={[styles.poweredBy, styles.verso10Typo]}>Powered by:</Text>
+      			<Image style={styles.lipsFundoBranco1Icon} resizeMode="center" source={require('./assets/LIPS-Fundo_branco.png')} />
+      			<Image style={styles.logoUfmg1Icon} resizeMode="center" source={require('./assets/Logo_UFMG.png')} />
     		</View>);
 };
 
 const styles = StyleSheet.create({
-  	buttonFlexBox: {
-    		justifyContent: "center",
-    		alignItems: "center"
+  	verso10Typo: {
+    		color: "rgba(0, 0, 0, 0.6)",
+    		textAlign: "center",
+    		fontSize: 12,
+    		position: "absolute"
   	},
-  	labelText: {
-    		fontSize: 28,
-    		lineHeight: 36,
-    		fontFamily: "Roboto-Regular",
-    		color: "#fff",
-    		textAlign: "center"
+  	olSomosO: {
+    		top: 71,
+    		left: 128,
+    		color: "#000",
+    		textAlign: "center",
+    		fontSize: 12,
+    		fontFamily: "Inter-Regular",
+    		position: "absolute"
   	},
-  	stateLayer: {
-    		alignSelf: "stretch",
-    		backgroundColor: "#1b1b1b",
-    		flexDirection: "row",
-    		paddingHorizontal: 24,
-    		paddingVertical: 10,
-    		alignItems: "center",
-    		flex: 1
+  	verso10: {
+    		top: 86,
+    		left: 166,
+    		fontFamily: "Inter-Regular",
+    		color: "rgba(0, 0, 0, 0.6)"
   	},
-  	button: {
-    		top: 450,
-    		height: 56,
-    		width: 324,
-    		backgroundColor: "#green",
-    		borderRadius: 100,
-    		left: 33,
-    		position: "absolute",
-    		alignItems: "center",
-    		overflow: "hidden"
+  	transparenteFundoBranco1Icon: {
+    		top: 133,
+    		left: 84,
+    		width: 221,
+    		height: 135,
+    		position: "absolute"
   	},
-  	button1: {
-    		top: 520,
-    		height: 56,
-    		width: 324,
-    		backgroundColor: "#65558f",
-    		borderRadius: 100,
-    		left: 33,
-    		position: "absolute",
-    		alignItems: "center",
-    		overflow: "hidden"
+  	poweredBy: {
+    		top: 571,
+    		left: 158,
+    		fontWeight: "700",
+    		fontFamily: "Inter-Bold"
   	},
-  	button2: {
-    		top: 590,
-    		height: 56,
-    		width: 324,
-    		backgroundColor: "#65558f",
-    		borderRadius: 100,
-    		left: 33,
-    		position: "absolute",
-    		alignItems: "center",
-    		overflow: "hidden"
+  	lipsFundoBranco1Icon: {
+    		top: 596,
+    		left: 103,
+    		width: 82,
+    		height: 46,
+    		position: "absolute"
+  	},
+  	logoUfmg1Icon: {
+    		top: 598,
+    		left: 185,
+    		width: 106,
+    		height: 41,
+    		position: "absolute"
   	},
   	iphone1314Configuraes: {
     		backgroundColor: "#fff",
+    		flex: 1,
     		width: "100%",
     		height: 844,
-    		overflow: "hidden",
-    		flex: 1
+    		overflow: "hidden"
   	}
 });
 

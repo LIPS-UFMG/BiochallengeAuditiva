@@ -45,11 +45,7 @@ const IPhone1314Dispositivos = () => {
           <View style={[styles.homeIndicator1, styles.homeLayout]} />
         </View>
       </View>
-      <Image
-        style={styles.transparenteFundoBranco1Icon}
-        
-        source="assets/transparente-fundo-branco.png"
-      />
+      <Image style={styles.transparenteFundoBranco1Icon} source={require('./assets/transparente-fundo-branco.png')} />
       <View style={[styles.buttonSecondary, styles.buttonSecondaryFlexBox]}>
         <Image
           style={styles.buttonSecondaryChild}

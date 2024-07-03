@@ -37,7 +37,7 @@ export default function Navigation() {
           }}
         />
         <Tab.Screen
-          name="Configurações"
+          name="Sobre"
           component={SettingsScreen}
           options={{
             tabBarIcon: ({ focused }) => (
