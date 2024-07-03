@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button } from "react-native";
-import { BleManager, Device } from "react-native-ble-plx";
+import { BleManager } from "react-native-ble-plx";
 
 const DeviceScreen = () => {
   const [manager, setManager] = useState(null);
@@ -17,35 +17,38 @@ const DeviceScreen = () => {
 
   const scanAndConnectToDevice = async () => {
     try {
-      manager?.startDeviceScan(null, null, (error, scannedDevice) => {
+      if (!manager) {
+        console.error("BleManager não inicializado.");
+        return;
+      }
+
+      manager.startDeviceScan(null, null, (error, scannedDevice) => {
         if (error) {
-          console.error("Error scanning for devices:", error.message);
+          console.error("Erro ao escanear dispositivos:", error.message);
           return;
         }
 
-        if (scannedDevice?.name === "MeuDispositivoBLE") {
-          // Substitua com o nome do seu dispositivo
-          manager?.stopDeviceScan();
+        if (scannedDevice && scannedDevice.name === "MeuDispositivoBLE") {
+          manager.stopDeviceScan();
           scannedDevice
             .connect()
             .then((connectedDevice) => {
-              console.log("Connected to device:", connectedDevice.name);
+              console.log("Conectado ao dispositivo:", connectedDevice.name);
               setDevice(connectedDevice);
             })
             .catch((connectError) => {
-              console.error(
-                "Failed to connect to device:",
-                connectError.message
-              );
+              console.error("Falha ao conectar:", connectError.message);
             });
         }
       });
 
       setTimeout(() => {
-        manager?.stopDeviceScan();
+        if (manager.isScanning) {
+          manager.stopDeviceScan();
+        }
       }, 10000); // Parar a varredura após 10 segundos
     } catch (scanError) {
-      console.error("Error scanning for devices:", scanError.message);
+      console.error("Erro ao escanear dispositivos:", scanError.message);
     }
   };
 
@@ -54,11 +57,11 @@ const DeviceScreen = () => {
       device
         .cancelConnection()
         .then(() => {
-          console.log("Disconnected from device");
+          console.log("Desconectado do dispositivo");
           setDevice(null);
         })
         .catch((disconnectError) => {
-          console.error("Failed to disconnect:", disconnectError.message);
+          console.error("Falha ao desconectar:", disconnectError.message);
         });
     }
   };
