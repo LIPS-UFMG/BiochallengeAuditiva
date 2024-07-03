@@ -50,7 +50,7 @@ const IPhone1314Dispositivos = () => {
         <Image
           style={styles.buttonSecondaryChild}
           resizeMode="cover"
-          source="Ellipse 6.png"
+          source={require('./assets/Ellipse.png')}
         />
         <Text
           style={[
@@ -234,6 +234,7 @@ const styles = StyleSheet.create({
     left: 46,
     elevation: 40,
     borderRadius: 150,
+    borderWidth: 2,
     width: 298,
     height: 57,
     flexDirection: "row",
@@ -245,7 +246,8 @@ const styles = StyleSheet.create({
       width: 0,
       height: -0.5,
     },
-    backgroundColor: "#37de00",
+    backgroundColor: "white",
+    borderColor: "#81b71a"
   },
   dispositivosConectados: {
     top: 225,
