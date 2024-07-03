@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Dimensions,
 } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
@@ -119,7 +120,7 @@ const HomeScreen = () => {
               <Text style={styles.transcriptionText}>{item}</Text>
             </View>
           )}
-          keyExtractor={(index) => index.toString()}
+          keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={
             <Text style={styles.noTranscriptionText}>
               Nenhuma transcrição disponível
@@ -168,14 +169,16 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    borderRadius: 30,
-    borderWidth: 2,
     width: "100%",
     backgroundColor: "#ffe1ad",
-    borderColor:"#ffb22c",
-    padding: "5%",
+    borderColor: "#ffb22c",
+    borderRadius: 30,
+    borderWidth: 2,
+    padding: 10,
   },
-  transcriptionsList: {},
+  transcriptionsList: {
+    paddingBottom: 20,
+  },
   transcriptionBox: {
     backgroundColor: "transparent",
     borderColor: "#ffb22c",
@@ -197,7 +200,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonsContainer: {
-    borderRadius: 30,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
@@ -220,7 +222,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF9800",
   },
   buttonText: {
-    fontFamily: "Montserrat",
     color: "#fff",
     textAlign: "center",
     fontSize: 16,
