@@ -169,14 +169,16 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     borderRadius: 30,
+    borderWidth: 2,
     width: "100%",
-    backgroundColor: "#ffc9b6",
+    backgroundColor: "#ffe1ad",
+    borderColor:"#ffb22c",
     padding: "5%",
   },
   transcriptionsList: {},
   transcriptionBox: {
     backgroundColor: "transparent",
-    borderColor: "blue",
+    borderColor: "#ffb22c",
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
@@ -190,7 +192,7 @@ const styles = StyleSheet.create({
   },
   noTranscriptionText: {
     textAlign: "center",
-    color: "#ff8b63",
+    color: "#fcaa1b",
     fontStyle: "italic",
     fontSize: 16,
   },
