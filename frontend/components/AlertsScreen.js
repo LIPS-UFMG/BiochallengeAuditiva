@@ -261,20 +261,20 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   iphone1314DispositivosChild: {
-    left: 20,
-    top: 300,
+    left: 10,
+    top: 290,
   },
   iphone1314DispositivosItem: {
-    top: 428,
-    left: 198,
+    top: 418,
+    left: 188,
   },
   iphone1314DispositivosInner: {
-    left: 198,
-    top: 300,
+    left: 188,
+    top: 290,
   },
   rectangleView: {
-    top: 505,
-    left: 22,
+    top: 495,
+    left: 12,
   },
   iphone1314Dispositivos: {
     flex: 1,
@@ -285,4 +285,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IPhone1314Dispositivos;
+export default IPhone1314Dispositivos
