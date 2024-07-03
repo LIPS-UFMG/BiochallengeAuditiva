@@ -10,29 +10,13 @@ import { Audio } from "expo-av";
 import axios from "axios";
 import "regenerator-runtime/runtime";
 
-const BACKEND_URL = 'http://192.168.0.84:3000'; // Substitua pelo seu IP local
+const BACKEND_URL = 'http://192.168.0.70:3000'; // Substitua pelo seu IP local
 
 const HomeScreen = () => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [transcriptions, setTranscriptions] = useState([]);
-  const [pythonText, setPythonText] = useState(""); // Estado para armazenar o texto do Python
-
-  // Fetch Python text when component mounts
-  useEffect(() => {
-    fetchPythonText();
-  }, []);
-
-  async function fetchPythonText() {
-    try {
-      const response = await axios.get(`${BACKEND_URL}/callPython`);
-      const pythonText = response.data.pythonText;
-      console.log('Python text received:', pythonText); // Adicione este log
-      setPythonText(pythonText);
-    } catch (error) {
-      console.error('Error fetching Python text:', error);
-    }
-  }
+  const [soundRecognitionResult, setSoundRecognitionResult] = useState(""); // Estado para armazenar o resultado do reconhecimento de sons
 
   useEffect(() => {
     if (isRecording) {
@@ -41,7 +25,7 @@ const HomeScreen = () => {
           await stopRecording();
           await startRecording();
         }
-      }, 6000);
+      }, 2000);
 
       return () => clearInterval(interval);
     }
@@ -88,7 +72,8 @@ const HomeScreen = () => {
         await recording.stopAndUnloadAsync();
         await recording.createNewLoadedSoundAsync();
         const fileUri = recording.getURI();
-        transcribeAudio(fileUri);
+        //transcribeAudio(fileUri);
+        recognize_sound(fileUri); // Chamar o reconhecimento de sons aqui
         setRecording(null);
       }
     } catch (error) {
@@ -123,13 +108,37 @@ const HomeScreen = () => {
     }
   }
 
+  async function recognize_sound(uri) {
+    try {
+      const formData = new FormData();
+      formData.append('audio', {
+        uri: uri,
+        type: 'audio/3gpp',
+        name: 'audio.3gp',
+      });
+
+      const response = await axios.post(`${BACKEND_URL}/recognize_sound`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const soundRecognitionResult = response.data.soundRecognitionResult;
+      if (soundRecognitionResult) {
+        setSoundRecognitionResult(soundRecognitionResult);
+      }
+    } catch (error) {
+      console.error('Error recognizing sound:', error);
+    }
+  }
+
   function clearRecordings() {
     setTranscriptions([]);
+    setSoundRecognitionResult(""); // Limpar o resultado de reconhecimento de som
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.pythonText}>{pythonText}</Text>
       <View style={styles.textContainer}>
         <FlatList
           data={transcriptions}
@@ -146,6 +155,11 @@ const HomeScreen = () => {
           }
           contentContainerStyle={styles.transcriptionsList}
         />
+        {soundRecognitionResult ? (
+          <View style={styles.transcriptionBox}>
+            <Text style={styles.transcriptionText}>{soundRecognitionResult}</Text>
+          </View>
+        ) : null}
       </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
@@ -208,13 +222,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontStyle: 'italic',
     fontSize: 16,
-  },
-  pythonText: {
-    color: 'black',
-    textAlign: 'center', // Centraliza o texto horizontalmente
-    fontSize: 16,
-    lineHeight: 22,
-    marginTop: 20, // Espaçamento acima do texto
   },
   buttonsContainer: {
     flexDirection: 'row',

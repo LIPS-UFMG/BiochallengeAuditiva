@@ -6,7 +6,7 @@ import ffprobe from 'ffprobe';
 import ffprobeStatic from 'ffprobe-static';
 import { SpeechClient } from '@google-cloud/speech';
 import { networkInterfaces } from 'os';
-import { exec } from 'child_process';  // Alteração aqui
+import { exec } from 'child_process';
 
 const app = express();
 const port = 3000;
@@ -80,32 +80,32 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
   }
 });
 
-app.get('/callPython', async (req, res) => {
+app.post('/recognize_sound', upload.single('audio'), async (req, res) => {
   try {
-    console.log('Endpoint /callPython accessed');
+    const filePath = req.file.path;
 
-    exec('python helper.py', (error, stdout, stderr) => {  // Alterado de 'python3' para 'python'
+    exec(`python sound_recognition.py ${filePath}`, (error, stdout, stderr) => {
       if (error) {
-        console.error('Error calling Python function:', error);
-        res.status(500).send('Error calling Python function');
+        console.error('Error calling Python sound recognition function:', error);
+        res.status(500).send('Error calling Python sound recognition function');
         return;
       }
       if (stderr) {
-        console.error('Error output from Python function:', stderr);
-        res.status(500).send('Error output from Python function');
+        console.error('Error output from Python sound recognition function:', stderr);
+        res.status(500).send('Error output from Python sound recognition function');
         return;
       }
 
-      console.log('Python script output:', stdout);
-      res.json({ pythonText: stdout.trim() });
+      console.log('Python sound recognition output:', stdout);
+      res.json({ soundRecognitionResult: stdout.trim() });
     });
 
   } catch (error) {
-    console.error('Error calling Python function:', error);
-    res.status(500).send('Error calling Python function');
+    console.error('Error calling Python sound recognition function:', error);
+    res.status(500).send('Error calling Python sound recognition function');
   }
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://${results['Wi-Fi 4']}:${port}`);
+  console.log(`Server is running on http://${results['Wi-Fi 4'][0]}:${port}`);
 });
