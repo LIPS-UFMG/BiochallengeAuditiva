@@ -16,23 +16,7 @@ const HomeScreen = () => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [transcriptions, setTranscriptions] = useState([]);
-  const [pythonText, setPythonText] = useState(""); // Estado para armazenar o texto do Python
-
-  // Fetch Python text when component mounts
-  useEffect(() => {
-    fetchPythonText();
-  }, []);
-
-  async function fetchPythonText() {
-    try {
-      const response = await axios.get(`${BACKEND_URL}/callPython`);
-      const pythonText = response.data.pythonText;
-      console.log('Python text received:', pythonText); // Adicione este log
-      setPythonText(pythonText);
-    } catch (error) {
-      console.error('Error fetching Python text:', error);
-    }
-  }
+  const [analysis, setAnalysis] = useState("");
 
   useEffect(() => {
     if (isRecording) {
@@ -88,6 +72,7 @@ const HomeScreen = () => {
         await recording.stopAndUnloadAsync();
         await recording.createNewLoadedSoundAsync();
         const fileUri = recording.getURI();
+        analyzeAudio(fileUri);
         transcribeAudio(fileUri);
         setRecording(null);
       }
@@ -123,13 +108,38 @@ const HomeScreen = () => {
     }
   }
 
+  async function analyzeAudio(uri) {
+    try {
+      const formData = new FormData();
+      formData.append('audio', {
+        uri: uri,
+        type: 'audio/3gpp',
+        name: 'audio.3gp',
+      });
+
+      const response = await axios.post(`${BACKEND_URL}/analyze`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const analysisResult = response.data.analysis;
+      if (analysisResult) {
+        setAnalysis(analysisResult);
+      }
+    } catch (error) {
+      console.error('Error analyzing audio:', error);
+    }
+  }
+
   function clearRecordings() {
     setTranscriptions([]);
+    setAnalysis("");
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.pythonText}>{pythonText}</Text>
+      <Text style={styles.analysisText}>{analysis}</Text>
       <View style={styles.textContainer}>
         <FlatList
           data={transcriptions}
@@ -209,12 +219,12 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     fontSize: 16,
   },
-  pythonText: {
+  analysisText: {
     color: 'black',
-    textAlign: 'center', // Centraliza o texto horizontalmente
+    textAlign: 'center',
     fontSize: 16,
     lineHeight: 22,
-    marginTop: 20, // Espaçamento acima do texto
+    marginTop: 20,
   },
   buttonsContainer: {
     flexDirection: 'row',
