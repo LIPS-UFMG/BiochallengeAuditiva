@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
 import { BleManager } from "react-native-ble-plx";
+import { Buffer } from "buffer";
 
 const DeviceName = "ESP32_BLE_Device"; // Nome do dispositivo ESP32 BLE
 const ServiceUUID = "0000ffe1-0000-1000-8000-00805f9b34fb"; // UUID do serviço
 const CharacteristicUUID = "0000ffe1-0000-1000-8000-00805f9b34fb"; // UUID da característica
 
 const DeviceScreen = () => {
-  const [bleManager, setBleManager] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [device, setDevice] = useState(null);
@@ -15,93 +15,58 @@ const DeviceScreen = () => {
 
   useEffect(() => {
     const manager = new BleManager();
-    setBleManager(manager);
 
     return () => {
-      if (manager) {
-        manager.destroy();
-      }
+      manager.destroy();
     };
   }, []);
 
-  const handleScan = () => {
-    if (!bleManager) {
-      console.error("BleManager não foi inicializado corretamente.");
-      return;
-    }
-
+  const handleScan = (manager) => {
     setIsScanning(true);
-    bleManager.startDeviceScan(null, null, (error, scannedDevice) => {
+    manager.startDeviceScan(null, null, (error, scannedDevice) => {
       if (error) {
         console.error("Erro ao escanear dispositivos:", error);
         setIsScanning(false);
         return;
       }
+
       if (scannedDevice?.name === DeviceName) {
-        connectToDevice(scannedDevice);
-        bleManager.stopDeviceScan();
+        connectToDevice(manager, scannedDevice);
+        manager.stopDeviceScan();
         setIsScanning(false);
       }
     });
   };
 
-  const connectToDevice = (device) => {
-    if (!bleManager) {
-      console.error("BleManager não foi inicializado corretamente.");
-      return;
-    }
-
+  const connectToDevice = (manager, device) => {
     device
       .connect()
       .then((connectedDevice) => {
         setDevice(connectedDevice);
         setIsConnected(true);
         console.log("Conectado ao dispositivo:", connectedDevice.id);
-        discoverServicesAndCharacteristics(connectedDevice);
+        return connectedDevice.discoverAllServicesAndCharacteristics();
+      })
+      .then((device) => {
+        const service = device.services().find((s) => s.uuid === ServiceUUID);
+        const characteristic = service.characteristics.find(
+          (c) => c.uuid === CharacteristicUUID
+        );
+        setCharacteristic(characteristic);
       })
       .catch((error) => {
         console.error("Erro ao conectar:", error);
       });
   };
 
-  const discoverServicesAndCharacteristics = (device) => {
-    if (!bleManager) {
-      console.error("BleManager não foi inicializado corretamente.");
-      return;
-    }
-
-    device
-      .discoverAllServicesAndCharacteristics()
-      .then((services) => {
-        const service = services.find((s) => s.uuid === ServiceUUID);
-        if (!service) {
-          console.warn("Serviço não encontrado");
-          return;
-        }
-        const characteristic = service.characteristics.find(
-          (c) => c.uuid === CharacteristicUUID
-        );
-        if (characteristic) {
-          setCharacteristic(characteristic);
-        } else {
-          console.warn("Característica não encontrada");
-        }
-      })
-      .catch((error) => {
-        console.error("Erro ao descobrir serviços e características:", error);
-      });
-  };
-
   const sendMessageToDevice = () => {
-    if (!bleManager || !characteristic) {
-      console.error(
-        "BleManager não foi inicializado corretamente ou característica não está pronta."
-      );
+    if (!characteristic) {
+      console.error("Característica não está pronta.");
       return;
     }
 
     const message = "Hello ESP32!";
-    const messageBase64 = Buffer.from(message).toString("base64"); // Convertendo mensagem para base64
+    const messageBase64 = Buffer.from(message).toString("base64");
 
     characteristic
       .writeWithoutResponse(messageBase64)
@@ -121,7 +86,7 @@ const DeviceScreen = () => {
       {!isConnected && (
         <Button
           title="Conectar com ESP32"
-          onPress={handleScan}
+          onPress={() => handleScan(bleManager)}
           disabled={isScanning}
         />
       )}

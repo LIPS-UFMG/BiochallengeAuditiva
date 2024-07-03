@@ -1,6 +1,8 @@
 {
   "expo": {
-    "plugins": ["react-native-ble-plx"],
+    "plugins": [
+      "react-native-ble-plx"
+    ],
     "name": "Biochallenge",
     "slug": "Biochallenge",
     "version": "1.0.0",
@@ -19,7 +21,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-meEscuta.png",
         "backgroundColor": "#E2C13B"
-      }
+      },
+      "permissions": [
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT"
+      ],
+      "package": "com.anonymous.Biochallenge"
     },
     "web": {
       "favicon": "./assets/icon-meEscuta.png"
