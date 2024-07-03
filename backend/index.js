@@ -6,6 +6,7 @@ import ffprobe from 'ffprobe';
 import ffprobeStatic from 'ffprobe-static';
 import { SpeechClient } from '@google-cloud/speech';
 import { networkInterfaces } from 'os';
+import { exec } from 'child_process';  // Alteração aqui
 
 const app = express();
 const port = 3000;
@@ -34,12 +35,10 @@ for (const name of Object.keys(nets)) {
 app.post('/transcribe', upload.single('audio'), async (req, res) => {
   try {
     const filePath = req.file.path;
-    
+
     const audioInfo = await ffprobe(filePath, { path: ffprobeStatic.path });
     const sampleRate = parseInt(audioInfo.streams[0].sample_rate, 10);
     const codec = audioInfo.streams[0].codec_name;
-
-    // console.log('Audio Info:', audioInfo);
 
     const audioBytes = fs.readFileSync(filePath).toString('base64');
 
@@ -69,7 +68,7 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
 
       res.json({ transcription: transcription });
     } else {
-      res.json({ transcription: null }); // Retorne null em vez de enviar um erro 404
+      res.json({ transcription: null });
     }
   } catch (error) {
     console.error('Error during transcription:', error);
@@ -81,6 +80,32 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
   }
 });
 
+app.get('/callPython', async (req, res) => {
+  try {
+    console.log('Endpoint /callPython accessed');
+
+    exec('python helper.py', (error, stdout, stderr) => {  // Alterado de 'python3' para 'python'
+      if (error) {
+        console.error('Error calling Python function:', error);
+        res.status(500).send('Error calling Python function');
+        return;
+      }
+      if (stderr) {
+        console.error('Error output from Python function:', stderr);
+        res.status(500).send('Error output from Python function');
+        return;
+      }
+
+      console.log('Python script output:', stdout);
+      res.json({ pythonText: stdout.trim() });
+    });
+
+  } catch (error) {
+    console.error('Error calling Python function:', error);
+    res.status(500).send('Error calling Python function');
+  }
+});
+
 app.listen(port, () => {
-  console.log(`Server is running on http://${results['Wi-Fi']}:${port}`);
+  console.log(`Server is running on http://${results['Wi-Fi 4']}:${port}`);
 });

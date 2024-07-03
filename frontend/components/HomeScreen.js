@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,16 +8,33 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
-import 'regenerator-runtime/runtime'
+import "regenerator-runtime/runtime";
 
-const BACKEND_URL = "http://192.168.0.200:3000";
+const BACKEND_URL = 'http://192.168.0.84:3000'; // Substitua pelo seu IP local
 
 const HomeScreen = () => {
-  const [recording, setRecording] = React.useState(null);
-  const [isRecording, setIsRecording] = React.useState(false);
-  const [transcriptions, setTranscriptions] = React.useState([]);
+  const [recording, setRecording] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcriptions, setTranscriptions] = useState([]);
+  const [pythonText, setPythonText] = useState(""); // Estado para armazenar o texto do Python
 
-  React.useEffect(() => {
+  // Fetch Python text when component mounts
+  useEffect(() => {
+    fetchPythonText();
+  }, []);
+
+  async function fetchPythonText() {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/callPython`);
+      const pythonText = response.data.pythonText;
+      console.log('Python text received:', pythonText); // Adicione este log
+      setPythonText(pythonText);
+    } catch (error) {
+      console.error('Error fetching Python text:', error);
+    }
+  }
+
+  useEffect(() => {
     if (isRecording) {
       const interval = setInterval(async () => {
         if (recording) {
@@ -33,7 +50,7 @@ const HomeScreen = () => {
   async function startRecording() {
     try {
       const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === "granted") {
+      if (perm.status === 'granted') {
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: true,
           playsInSilentModeIOS: true,
@@ -41,13 +58,13 @@ const HomeScreen = () => {
         const { recording } = await Audio.Recording.createAsync({
           isMeteringEnabled: true,
           android: {
-            extension: ".3gp",
+            extension: '.3gp',
             outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_AMR_WB,
             audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AMR_WB,
             sampleRate: 16000,
           },
           ios: {
-            extension: ".caf",
+            extension: '.caf',
             audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
             sampleRate: 16000,
             numberOfChannels: 1,
@@ -61,7 +78,7 @@ const HomeScreen = () => {
         setIsRecording(true);
       }
     } catch (err) {
-      console.error("Failed to start recording", err);
+      console.error('Failed to start recording', err);
     }
   }
 
@@ -75,22 +92,22 @@ const HomeScreen = () => {
         setRecording(null);
       }
     } catch (error) {
-      console.error("Error stopping recording or sending audio:", error);
+      console.error('Error stopping recording or sending audio:', error);
     }
   }
 
   async function transcribeAudio(uri) {
     try {
       const formData = new FormData();
-      formData.append("audio", {
+      formData.append('audio', {
         uri: uri,
-        type: "audio/3gpp",
-        name: "audio.3gp",
+        type: 'audio/3gpp',
+        name: 'audio.3gp',
       });
 
       const response = await axios.post(`${BACKEND_URL}/transcribe`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
 
@@ -102,7 +119,7 @@ const HomeScreen = () => {
         ]);
       }
     } catch (error) {
-      console.error("Error transcribing audio:", error);
+      console.error('Error transcribing audio:', error);
     }
   }
 
@@ -112,6 +129,7 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.pythonText}>{pythonText}</Text>
       <View style={styles.textContainer}>
         <FlatList
           data={transcriptions}
@@ -120,7 +138,7 @@ const HomeScreen = () => {
               <Text style={styles.transcriptionText}>{item}</Text>
             </View>
           )}
-          keyExtractor={(index) => index.toString()}
+          keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={
             <Text style={styles.noTranscriptionText}>
               Nenhuma transcrição disponível
@@ -138,20 +156,18 @@ const HomeScreen = () => {
           onPress={
             isRecording
               ? async () => {
-                  setIsRecording(false);
-                  await stopRecording();
-                }
+                setIsRecording(false);
+                await stopRecording();
+              }
               : startRecording
-          }
-        >
+          }>
           <Text style={styles.buttonText}>
-            {isRecording ? "Parar Gravação" : "Iniciar Gravação"}
+            {isRecording ? 'Parar Gravação' : 'Iniciar Gravação'}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.clearButton]}
-          onPress={clearRecordings}
-        >
+          onPress={clearRecordings}>
           <Text style={styles.buttonText}>Limpar Transcrições</Text>
         </TouchableOpacity>
       </View>
@@ -162,63 +178,70 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 20,
   },
   textContainer: {
     flex: 1,
-    width: "100%",
-    backgroundColor: "#AAAAAA",
-    padding: "5%",
+    width: '100%',
+    backgroundColor: '#AAAAAA',
+    padding: '5%',
   },
   transcriptionsList: {},
   transcriptionBox: {
-    backgroundColor: "transparent",
-    borderColor: "blue",
+    backgroundColor: 'transparent',
+    borderColor: 'blue',
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     marginVertical: 5,
   },
   transcriptionText: {
-    color: "black",
-    textAlign: "left",
+    color: 'black',
+    textAlign: 'left',
     fontSize: 16,
     lineHeight: 22,
   },
   noTranscriptionText: {
-    color: "gray",
-    fontStyle: "italic",
+    color: 'gray',
+    fontStyle: 'italic',
     fontSize: 16,
   },
+  pythonText: {
+    color: 'black',
+    textAlign: 'center', // Centraliza o texto horizontalmente
+    fontSize: 16,
+    lineHeight: 22,
+    marginTop: 20, // Espaçamento acima do texto
+  },
   buttonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '100%',
     marginTop: 20,
   },
   button: {
     padding: 15,
     borderRadius: 5,
-    alignItems: "center",
-    width: "40%",
+    alignItems: 'center',
+    width: '30%',
   },
   startButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: '#4CAF50',
   },
   stopButton: {
-    backgroundColor: "#F44336",
+    backgroundColor: '#F44336',
   },
   clearButton: {
-    backgroundColor: "#FF9800",
+    backgroundColor: '#FF9800',
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 
