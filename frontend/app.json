@@ -1,5 +1,6 @@
 {
   "expo": {
+    "plugins": ["react-native-ble-plx"],
     "name": "Biochallenge",
     "slug": "Biochallenge",
     "version": "1.0.0",

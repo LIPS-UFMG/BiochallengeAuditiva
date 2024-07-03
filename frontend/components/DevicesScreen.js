@@ -46,6 +46,11 @@ const DeviceScreen = () => {
   };
 
   const connectToDevice = (device) => {
+    if (!bleManager) {
+      console.error("BleManager não foi inicializado corretamente.");
+      return;
+    }
+
     device
       .connect()
       .then((connectedDevice) => {
@@ -60,6 +65,11 @@ const DeviceScreen = () => {
   };
 
   const discoverServicesAndCharacteristics = (device) => {
+    if (!bleManager) {
+      console.error("BleManager não foi inicializado corretamente.");
+      return;
+    }
+
     device
       .discoverAllServicesAndCharacteristics()
       .then((services) => {
@@ -83,8 +93,10 @@ const DeviceScreen = () => {
   };
 
   const sendMessageToDevice = () => {
-    if (!characteristic) {
-      console.warn("Característica não está pronta para enviar mensagem");
+    if (!bleManager || !characteristic) {
+      console.error(
+        "BleManager não foi inicializado corretamente ou característica não está pronta."
+      );
       return;
     }
 
