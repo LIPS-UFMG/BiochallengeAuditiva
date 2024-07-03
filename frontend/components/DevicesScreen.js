@@ -1,87 +1,135 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Button } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Button, StyleSheet } from "react-native";
 import { BleManager } from "react-native-ble-plx";
 
+const DeviceName = "ESP32_BLE_Device"; // Nome do dispositivo ESP32 BLE
+const ServiceUUID = "0000ffe1-0000-1000-8000-00805f9b34fb"; // UUID do serviço
+const CharacteristicUUID = "0000ffe1-0000-1000-8000-00805f9b34fb"; // UUID da característica
+
 const DeviceScreen = () => {
-  const [manager, setManager] = useState(null);
+  const [bleManager, setBleManager] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const [device, setDevice] = useState(null);
+  const [characteristic, setCharacteristic] = useState(null);
 
   useEffect(() => {
-    const bleManager = new BleManager();
-    setManager(bleManager);
+    const manager = new BleManager();
+    setBleManager(manager);
 
     return () => {
-      bleManager.destroy();
+      if (manager) {
+        manager.destroy();
+      }
     };
   }, []);
 
-  const scanAndConnectToDevice = async () => {
-    try {
-      if (!manager) {
-        console.error("BleManager não inicializado.");
+  const handleScan = () => {
+    if (!bleManager) {
+      console.error("BleManager não foi inicializado corretamente.");
+      return;
+    }
+
+    setIsScanning(true);
+    bleManager.startDeviceScan(null, null, (error, scannedDevice) => {
+      if (error) {
+        console.error("Erro ao escanear dispositivos:", error);
+        setIsScanning(false);
         return;
       }
-
-      manager.startDeviceScan(null, null, (error, scannedDevice) => {
-        if (error) {
-          console.error("Erro ao escanear dispositivos:", error.message);
-          return;
-        }
-
-        if (scannedDevice && scannedDevice.name === "MeuDispositivoBLE") {
-          manager.stopDeviceScan();
-          scannedDevice
-            .connect()
-            .then((connectedDevice) => {
-              console.log("Conectado ao dispositivo:", connectedDevice.name);
-              setDevice(connectedDevice);
-            })
-            .catch((connectError) => {
-              console.error("Falha ao conectar:", connectError.message);
-            });
-        }
-      });
-
-      setTimeout(() => {
-        if (manager.isScanning) {
-          manager.stopDeviceScan();
-        }
-      }, 10000); // Parar a varredura após 10 segundos
-    } catch (scanError) {
-      console.error("Erro ao escanear dispositivos:", scanError.message);
-    }
+      if (scannedDevice?.name === DeviceName) {
+        connectToDevice(scannedDevice);
+        bleManager.stopDeviceScan();
+        setIsScanning(false);
+      }
+    });
   };
 
-  const disconnectFromDevice = () => {
-    if (device) {
-      device
-        .cancelConnection()
-        .then(() => {
-          console.log("Desconectado do dispositivo");
-          setDevice(null);
-        })
-        .catch((disconnectError) => {
-          console.error("Falha ao desconectar:", disconnectError.message);
-        });
+  const connectToDevice = (device) => {
+    device
+      .connect()
+      .then((connectedDevice) => {
+        setDevice(connectedDevice);
+        setIsConnected(true);
+        console.log("Conectado ao dispositivo:", connectedDevice.id);
+        discoverServicesAndCharacteristics(connectedDevice);
+      })
+      .catch((error) => {
+        console.error("Erro ao conectar:", error);
+      });
+  };
+
+  const discoverServicesAndCharacteristics = (device) => {
+    device
+      .discoverAllServicesAndCharacteristics()
+      .then((services) => {
+        const service = services.find((s) => s.uuid === ServiceUUID);
+        if (!service) {
+          console.warn("Serviço não encontrado");
+          return;
+        }
+        const characteristic = service.characteristics.find(
+          (c) => c.uuid === CharacteristicUUID
+        );
+        if (characteristic) {
+          setCharacteristic(characteristic);
+        } else {
+          console.warn("Característica não encontrada");
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao descobrir serviços e características:", error);
+      });
+  };
+
+  const sendMessageToDevice = () => {
+    if (!characteristic) {
+      console.warn("Característica não está pronta para enviar mensagem");
+      return;
     }
+
+    const message = "Hello ESP32!";
+    const messageBase64 = Buffer.from(message).toString("base64"); // Convertendo mensagem para base64
+
+    characteristic
+      .writeWithoutResponse(messageBase64)
+      .then(() => {
+        console.log("Mensagem enviada com sucesso");
+      })
+      .catch((error) => {
+        console.error("Erro ao enviar mensagem:", error);
+      });
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Biblioteca React Native BLE PLX</Text>
-      <Button title="Escanear e Conectar" onPress={scanAndConnectToDevice} />
-      <Button
-        title="Desconectar"
-        onPress={disconnectFromDevice}
-        disabled={!device}
-      />
-      {device && (
-        <View>
-          <Text>Dispositivo Conectado: {device.name}</Text>
-        </View>
+    <View style={styles.container}>
+      <Text style={styles.statusText}>
+        {isConnected ? "Conectado com ESP32!" : "Não conectado"}
+      </Text>
+      {!isConnected && (
+        <Button
+          title="Conectar com ESP32"
+          onPress={handleScan}
+          disabled={isScanning}
+        />
+      )}
+      {isConnected && (
+        <Button title="Enviar mensagem" onPress={sendMessageToDevice} />
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  statusText: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+});
 
 export default DeviceScreen;
