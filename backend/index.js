@@ -6,6 +6,7 @@ import ffprobe from 'ffprobe';
 import ffprobeStatic from 'ffprobe-static';
 import { SpeechClient } from '@google-cloud/speech';
 import { networkInterfaces } from 'os';
+import noble from 'noble';
 
 const app = express();
 const port = 3000;
@@ -69,7 +70,7 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
 
       res.json({ transcription: transcription });
     } else {
-      res.json({ transcription: null }); // Retorne null em vez de enviar um erro 404
+      res.json({ transcription: null });
     }
   } catch (error) {
     console.error('Error during transcription:', error);
@@ -81,6 +82,22 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
   }
 });
 
+try {
+  noble.on('stateChange', state => {
+    if (state === 'poweredOn') {
+      noble.startScanning();
+    } else {
+      noble.stopScanning();
+    }
+  });
+
+  noble.on('discover', peripheral => {
+    console.log('Discovered peripheral:', peripheral.advertisement.localName);
+  });
+} catch (error) {
+  console.error('Bluetooth initialization failed. Make sure your device has Bluetooth support:', error.message);
+}
+
 app.listen(port, () => {
-  console.log(`Server is running on http://${results['Wi-Fi']}:${port}`);
+  console.log(`Server is running on http://${results['Wi-Fi 4']}:${port}`);
 });
