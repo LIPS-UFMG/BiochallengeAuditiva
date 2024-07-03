@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     		position: "absolute"
   	},
   	olSomosO: {
-    		top: 71,
+    		top: 511,
     		left: 128,
     		color: "#000",
     		textAlign: "center",
@@ -31,16 +31,16 @@ const styles = StyleSheet.create({
     		position: "absolute"
   	},
   	verso10: {
-    		top: 86,
+    		top: 526,
     		left: 166,
     		fontFamily: "Inter-Regular",
     		color: "rgba(0, 0, 0, 0.6)"
   	},
   	transparenteFundoBranco1Icon: {
-    		top: 133,
-    		left: 84,
-    		width: 221,
-    		height: 135,
+    		top: 56,
+			left: 20,
+    		width: 351,
+    		height: 214,
     		position: "absolute"
   	},
   	poweredBy: {
