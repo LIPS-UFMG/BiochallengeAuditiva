@@ -10,7 +10,7 @@ import { Audio } from "expo-av";
 import axios from "axios";
 import 'regenerator-runtime/runtime'
 
-const BACKEND_URL = "http://192.168.0.84:3000";
+const BACKEND_URL = "http://192.168.0.156:3000";
 
 const HomeScreen = () => {
   const [recording, setRecording] = React.useState(null);

@@ -15,6 +15,6 @@
     "ffprobe": "^1.1.2",
     "ffprobe-static": "^3.1.0",
     "multer": "^1.4.5-lts.1",
-    "noble": "^1.9.1"
+    "noble-winrt": "^0.1.1"
   }
 }
