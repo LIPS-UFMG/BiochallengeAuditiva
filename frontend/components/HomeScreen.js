@@ -241,8 +241,9 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
+    borderRadius: 30,
     width: "100%",
-    backgroundColor: "#AAAAAA",
+    backgroundColor: "#ffc9b6",
     padding: "5%",
   },
   transcriptionsList: {},
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderColor: "blue",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     padding: 10,
     marginVertical: 5,
   },
@@ -267,11 +268,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   noTranscriptionText: {
-    color: "gray",
+    textAlign: "center",
+    color: "#ff8b63",
     fontStyle: "italic",
     fontSize: 16,
   },
   buttonsContainer: {
+    borderRadius: 30,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
@@ -280,7 +283,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 50,
     alignItems: "center",
     width: "40%",
   },
@@ -294,7 +297,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF9800",
   },
   buttonText: {
+    fontFamily: "Montserrat",
     color: "#fff",
+    textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
   },
