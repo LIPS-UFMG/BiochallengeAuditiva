@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import * as FileSystem from "expo-file-system";
 import {
   StyleSheet,
@@ -9,27 +9,36 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
-import "regenerator-runtime/runtime";
+import "regenerator-runtime";
 
-const BACKEND_URL = "http://192.168.0.84:3000";
+const BACKEND_URL = "http://192.168.0.156:3000";
 
 const HomeScreen = () => {
-  const [recording, setRecording] = React.useState(null);
-  const [isRecording, setIsRecording] = React.useState(false);
-  const [transcriptions, setTranscriptions] = React.useState([]);
+  const [recording, setRecording] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcriptions, setTranscriptions] = useState([]);
+  const [audioQueue, setAudioQueue] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const intervalRef = useRef(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRecording) {
-      const interval = setInterval(async () => {
+      intervalRef.current = setInterval(async () => {
         if (recording) {
           await stopRecording();
           await startRecording();
         }
       }, 6000);
-
-      return () => clearInterval(interval);
     }
+
+    return () => clearInterval(intervalRef.current);
   }, [isRecording, recording]);
+
+  useEffect(() => {
+    if (audioQueue.length > 0 && !isProcessing) {
+      processAudioQueue();
+    }
+  }, [audioQueue, isProcessing]);
 
   async function startRecording() {
     console.log("Starting recording...");
@@ -73,53 +82,56 @@ const HomeScreen = () => {
     try {
       if (recording) {
         await recording.stopAndUnloadAsync();
-        await recording.createNewLoadedSoundAsync();
         const fileUri = recording.getURI();
         console.log("Recording stopped, URI:", fileUri);
-        await handleAudioProcessing(fileUri);
+        setAudioQueue((prevQueue) => [...prevQueue, fileUri]);
         setRecording(null);
       }
     } catch (error) {
-      console.error("Error stopping recording or sending audio:", error);
+      console.error(
+        "Error stopping recording or adding audio to queue:",
+        error
+      );
     }
   }
 
-  async function handleAudioProcessing(uri) {
-    console.log("Starting audio processing for URI:", uri);
+  async function processAudioQueue() {
+    if (audioQueue.length === 0 || isProcessing) {
+      return;
+    }
+
+    setIsProcessing(true);
+    const [currentAudio, ...remainingQueue] = audioQueue;
+
     try {
-      const transcriptionPromise = transcribeAudio(uri);
-      const analysisPromise = analyzeAudio(uri);
+      const transcriptionPromise = await transcribeAudio(currentAudio);
+      const analysisPromise = await analyzeAudio(currentAudio);
 
       const [transcription, analysisResult] = await Promise.all([
         transcriptionPromise,
         analysisPromise,
       ]);
 
-      console.log("Audio processing completed");
-
       if (transcription) {
         setTranscriptions((prevTranscriptions) => [
           ...prevTranscriptions,
           { text: transcription, analysis: analysisResult },
         ]);
-        console.log("Transcription:", transcription);
-        console.log("Analysis result:", analysisResult);
       }
     } catch (error) {
-      console.error("Error processing audio:", error);
+      console.error("Error processing audio queue:", error);
     } finally {
-      // Excluir o arquivo temporário após o processamento
       try {
-        await FileSystem.deleteAsync(uri);
-        console.log("Temporary file deleted:", uri);
+        await FileSystem.deleteAsync(currentAudio);
       } catch (deleteError) {
         console.error("Error deleting temporary file:", deleteError);
       }
+      setAudioQueue(remainingQueue);
+      setIsProcessing(false);
     }
   }
 
   async function transcribeAudio(uri) {
-    console.log("Starting transcription for URI:", uri);
     try {
       const formData = new FormData();
       formData.append("audio", {
@@ -134,7 +146,6 @@ const HomeScreen = () => {
         },
       });
 
-      console.log("Transcription response received");
       return response.data.transcription;
     } catch (error) {
       console.error("Error transcribing audio:", error);
@@ -143,7 +154,6 @@ const HomeScreen = () => {
   }
 
   async function analyzeAudio(uri) {
-    console.log("Starting analysis for URI:", uri);
     try {
       const formData = new FormData();
       formData.append("audio", {
@@ -158,7 +168,6 @@ const HomeScreen = () => {
         },
       });
 
-      console.log("Analysis response received");
       return response.data.analysis;
     } catch (error) {
       console.error("Error analyzing audio:", error);
