@@ -128,5 +128,5 @@ app.post('/analyze', upload.single('audio'), async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on http://${results['Wi-Fi 4'][0]}:${port}`);
+    console.log(`Server is running on http://${results['Wi-Fi 4']}:${port}`);
 });
