@@ -4,29 +4,25 @@ import * as fs from 'fs';
 import { unlinkSync } from 'fs';
 import { exec } from 'child_process';
 import path from 'path';
-import { fileURLToPath } from 'url'; // Importar para obter __dirname
+import { fileURLToPath } from 'url';
+import { SpeechClient } from '@google-cloud/speech';
+import { networkInterfaces } from 'os';
+import ffprobe from 'ffprobe';
+import ffprobeStatic from 'ffprobe-static';
 
 const app = express();
 const port = 3000;
 
 const upload = multer({ dest: 'uploads/' });
 
-// Obter __dirname usando import.meta.url
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configuração do cliente Speech-to-Text do Google Cloud
 process.env.GOOGLE_APPLICATION_CREDENTIALS = 'credentials.json';
-
-import { SpeechClient } from '@google-cloud/speech';
-
 const speechClient = new SpeechClient();
 
-// Função para obter endereços IP
-import { networkInterfaces } from 'os';
 const nets = networkInterfaces();
 const results = Object.create(null);
-
 for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
         const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4;
@@ -39,7 +35,22 @@ for (const name of Object.keys(nets)) {
     }
 }
 
-// Endpoint para transcrever áudio
+const analyzeAudio = (filePath) => {
+    return new Promise((resolve, reject) => {
+        exec(`python ${path.join(__dirname, 'analyze_audio.py')} "${filePath}"`, (error, stdout, stderr) => {
+            if (error) {
+                reject('Error calling Python function');
+                return;
+            }
+            if (stderr) {
+                reject('Error output from Python function');
+                return;
+            }
+            resolve(stdout.trim());
+        });
+    });
+};
+
 app.post('/transcribe', upload.single('audio'), async (req, res) => {
     try {
         const filePath = req.file.path;
@@ -99,52 +110,23 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
     }
 });
 
-// Endpoint para análise de áudio usando script Python
-app.post('/analyze', upload.single('audio'), (req, res) => {
+app.post('/analyze', upload.single('audio'), async (req, res) => {
     try {
-        console.log('Endpoint /analyze accessed');
         const filePath = req.file.path;
+        if (!filePath) throw new Error('No audio file uploaded');
 
-        // Verificar se o arquivo existe antes de processá-lo
-        if (!fs.existsSync(filePath)) {
-            throw new Error('File not found: ' + filePath);
-        }
+        const analysisResult = await analyzeAudio(filePath);
+        console.log(`Frequency Analysis Result: ${analysisResult}`); // Print the frequency result to console
 
-        // Log para verificação do caminho do arquivo
-        console.log('File path:', filePath);
-
-        // Usar path.join para garantir que o caminho do arquivo esteja corretamente formatado
-        const normalizedFilePath = path.join(__dirname, filePath);
-        console.log('Normalized file path:', normalizedFilePath);
-
-        // Chamar o script Python para análise de áudio
-        exec(`python ${path.join(__dirname, 'analyze_audio.py')} "${normalizedFilePath}"`, (error, stdout, stderr) => {
-            if (error) {
-                console.error('Error calling Python function:', error);
-                res.status(500).send('Error calling Python function');
-                return;
-            }
-            if (stderr) {
-                console.error('Error output from Python function:', stderr);
-                res.status(500).send('Error output from Python function');
-                return;
-            }
-
-            console.log('Python script output:', stdout);
-            res.json({ analysis: stdout.trim() }); // Enviar resposta para o frontend
-        });
+        res.json({ analysis: analysisResult }); // Return the analysis result
     } catch (error) {
-        console.error('Error calling Python function:', error);
-        res.status(500).send('Error calling Python function');
+        console.error('Error during analysis:', error);
+        res.status(500).send('Error during analysis');
     } finally {
-        // Excluir o arquivo de áudio após o processamento
-        if (req.file && req.file.path) {
-            unlinkSync(req.file.path);
-        }
+        if (req.file && req.file.path) unlinkSync(req.file.path);
     }
 });
 
-// Iniciar o servidor
 app.listen(port, () => {
-    console.log(`Server is running on http://${results['Wi-Fi 4']}:${port}`);
+    console.log(`Server is running on http://${results['Wi-Fi 4'][0]}:${port}`);
 });

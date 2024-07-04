@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
 import "regenerator-runtime/runtime";
@@ -72,8 +66,8 @@ const HomeScreen = () => {
         await recording.stopAndUnloadAsync();
         await recording.createNewLoadedSoundAsync();
         const fileUri = recording.getURI();
-        analyzeAudio(fileUri);
         transcribeAudio(fileUri);
+        analyzeAudio(fileUri);
         setRecording(null);
       }
     } catch (error) {
@@ -126,6 +120,7 @@ const HomeScreen = () => {
       const analysisResult = response.data.analysis;
       if (analysisResult) {
         setAnalysis(analysisResult);
+        console.log('Análise de frequência:', analysisResult); // Printar a frequência no console
       }
     } catch (error) {
       console.error('Error analyzing audio:', error);

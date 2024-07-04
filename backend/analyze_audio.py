@@ -34,11 +34,11 @@ def analyze_audio(file_path):
 
     freq = analyze_frequency(wav_path)
 
-    if 650 <= freq < 850:
+    if 1300 <= freq:
         return "O áudio é uma sirene de ambulância."
-    elif 850 <= freq < 1100:
+    elif 650 <= freq < 1300:
         return "O áudio é um alarme de incêndio."
-    elif 1100 <= freq or 200 <= freq < 650:
+    elif 400 <= freq < 650:
         return "O áudio é um choro de bebê."
     else:
         return "O áudio é uma conversa."
