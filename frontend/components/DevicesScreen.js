@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, TextInput } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import axios from "axios";
 
 const BACKEND_URL = "http://192.168.0.156:3000";
@@ -26,8 +32,10 @@ const DevicesScreen = () => {
   const connectDevice = async () => {
     try {
       const response = await axios.post(`${BACKEND_URL}/connect`);
-      setIsConnected(true);
-      setDevice(response.data.device);
+      if (response.data.message === "Connected successfully.") {
+        setIsConnected(true);
+        setDevice(response.data.device);
+      }
     } catch (error) {
       console.error("Error connecting to device:", error);
     }
@@ -35,9 +43,11 @@ const DevicesScreen = () => {
 
   const disconnectDevice = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/disconnect`);
-      setIsConnected(false);
-      setDevice(null);
+      const response = await axios.post(`${BACKEND_URL}/disconnect`);
+      if (response.data.message === "Disconnected successfully.") {
+        setIsConnected(false);
+        setDevice(null);
+      }
     } catch (error) {
       console.error("Error disconnecting from device:", error);
     }

@@ -14,7 +14,7 @@ const port = 3000;
 let connectedDevice = null;
 let isConnected = false;
 
-const DeviceName = "ESP32_BLE_Device"; // Nome do dispositivo ESP32 BLE
+const DeviceUUID = "30aea40696aa"; // UUID do dispositivo ESP32 BLE (substituto do endereço MAC)
 const ServiceUUID = "0000ffe1-0000-1000-8000-00805f9b34fb"; // UUID do serviço
 const CharacteristicUUID = "0000ffe1-0000-1000-8000-00805f9b34fb"; // UUID da característica
 
@@ -41,43 +41,75 @@ for (const name of Object.keys(nets)) {
 
 noble.on("stateChange", (state) => {
   if (state === "poweredOn") {
-    console.log("Scanning for devices...");
-    noble.startScanning();
+    console.log("Bluetooth powered on. Scanning for devices...");
+    noble.startScanning([ServiceUUID], false);
   } else {
     noble.stopScanning();
   }
 });
 
 noble.on("discover", (device) => {
-  if (device.advertisement.localName === DeviceName) {
+  console.log(
+    "Discovered device:",
+    device.advertisement.localName || "(no name)"
+  );
+  console.log("Device details:", device);
+
+  // Log dos dados do anúncio BLE
+  console.log("Advertisement:", device.advertisement);
+
+  if (device.uuid === DeviceUUID) {
+    console.log("Found device with UUID. Stopping scan...");
     noble.stopScanning();
     device.connect((error) => {
       if (error) {
         console.error("Connection error:", error);
       } else {
         connectedDevice = device;
-        console.log("Connected to device:", device.address);
+        console.log("Connected to device:", device.uuid);
         isConnected = true;
+        setupDevice(device);
       }
     });
   }
 });
 
+function setupDevice(device) {
+  device.discoverSomeServicesAndCharacteristics(
+    [ServiceUUID],
+    [CharacteristicUUID],
+    (error, services, characteristics) => {
+      if (error) {
+        console.error("Discovery error:", error);
+      } else {
+        console.log("Services and characteristics discovered.");
+      }
+    }
+  );
+
+  device.on("disconnect", () => {
+    console.log("Device disconnected.");
+    connectedDevice = null;
+    isConnected = false;
+    noble.startScanning([ServiceUUID], false);
+  });
+}
+
 app.get("/status", (req, res) => {
   res.json({
     isConnected: !!connectedDevice,
-    device: connectedDevice ? connectedDevice.address : null,
+    device: connectedDevice ? connectedDevice.uuid : null,
   });
 });
 
 app.post("/connect", (req, res) => {
   if (!connectedDevice) {
-    noble.startScanning();
-    res.json({ message: "Scanning for devices..." });
+    noble.startScanning([ServiceUUID], false);
+    res.json({ message: "Scanning for device..." });
   } else {
     res.json({
       message: "Already connected.",
-      device: connectedDevice.address,
+      device: connectedDevice.uuid,
     });
   }
 });
@@ -87,6 +119,7 @@ app.post("/disconnect", (req, res) => {
     connectedDevice.disconnect((error) => {
       if (error) {
         console.error("Disconnection error:", error);
+        res.status(500).json({ message: "Disconnection error." });
       } else {
         connectedDevice = null;
         isConnected = false;
