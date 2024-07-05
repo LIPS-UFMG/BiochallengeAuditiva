@@ -47,9 +47,7 @@ for (const name of Object.keys(nets)) {
 }
 
 noble.on("stateChange", (state) => {
-  if (state === "poweredOn") {
-    noble.startScanning([ServiceUUID], false);
-  } else {
+  if (state !== "poweredOn") {
     noble.stopScanning();
   }
 });
@@ -159,24 +157,25 @@ app.post("/send", (req, res) => {
 });
 
 app.post("/transcribe", upload.single("audio"), async (req, res) => {
-const analyzeAudio = (filePath) => {
-  return new Promise((resolve, reject) => {
-    exec(
-      `python ${path.join(__dirname, "analyze_audio.py")} "${filePath}"`,
-      (error, stdout, stderr) => {
-        if (error) {
-          reject("Error calling Python function");
-          return;
+  const analyzeAudio = (filePath) => {
+    return new Promise((resolve, reject) => {
+      exec(
+        `python ${path.join(__dirname, "analyze_audio.py")} "${filePath}"`,
+        (error, stdout, stderr) => {
+          if (error) {
+            reject("Error calling Python function");
+            return;
+          }
+          if (stderr) {
+            reject("Error output from Python function");
+            return;
+          }
+          resolve(stdout.trim());
         }
-        if (stderr) {
-          reject("Error output from Python function");
-          return;
-        }
-        resolve(stdout.trim());
-      }
-    );
-  });
-};
+      );
+    });
+  };
+})
 
 app.post("/analyze", upload.single("audio"), async (req, res) => {
   console.log("A: Received analysis request");
