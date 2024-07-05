@@ -29,7 +29,7 @@ const HomeScreen = () => {
           await stopRecording();
           await startRecording();
         }
-      }, 6000);
+      }, 4000);
     }
 
     return () => clearInterval(intervalRef.current);
