@@ -201,6 +201,7 @@ const HomeScreen = () => {
   }
 
   function getAnalysisTextColor(analysis) {
+    if (!analysis) return "black";
     if (analysis.includes("bebe")) return "red";
     if (analysis.includes("incendio")) return "blue";
     if (analysis.includes("campainha")) return "orange";
@@ -208,6 +209,7 @@ const HomeScreen = () => {
   }
 
   function getBoxBackgroundColor(analysis) {
+    if (!analysis) return "white";
     if (analysis.includes("bebe")) return "#ffcccc"; // Light red
     if (analysis.includes("incendio")) return "#cceeff"; // Light blue
     if (analysis.includes("campainha")) return "#ffebcc"; // Light orange
