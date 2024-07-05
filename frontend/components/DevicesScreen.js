@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   statusText: {
-  textAlign: "center",
+    textAlign: "center",
     fontSize: 18,
     marginBottom: 20,
   },

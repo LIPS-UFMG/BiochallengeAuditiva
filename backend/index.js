@@ -13,7 +13,7 @@ import noble from "noble-winrt"; // Biblioteca BLE
 const app = express();
 const port = 3000;
 
-let characteristics;
+let characteristics = null; // Inicialize `characteristics` como null
 let connectedDevice = null;
 
 const DeviceUUID = "30aea40696aa"; // UUID do dispositivo ESP32 BLE (substituto do endereço MAC)
@@ -80,14 +80,14 @@ app.post("/connect", (req, res) => {
           peripheral.discoverSomeServicesAndCharacteristics(
             [ServiceUUID],
             [CharacteristicUUID],
-            (err, services, characteristics) => {
+            (err, services, discoveredCharacteristics) => {
               if (err) {
                 console.error("Service discovery error:", err);
                 return res
                   .status(500)
                   .json({ message: "Service discovery error." });
               }
-              characteristics = characteristics;
+              characteristics = discoveredCharacteristics;
               noble.removeListener("discover", onDiscover); // Remove listener after connecting
               res.json({
                 message: "Connected successfully.",
