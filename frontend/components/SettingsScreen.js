@@ -1,89 +1,91 @@
 import * as React from "react";
-import {Text, StyleSheet, View} from "react-native";
+import { Text, StyleSheet, Image, View, Dimensions } from "react-native";
 
 const IPhone1314Configuraes = () => {
-  	
-  	return (
-    		<View style={styles.iphone1314Configuraes}>
-      			<View style={[styles.button, styles.buttonFlexBox]}>
-        				<View style={[styles.stateLayer, styles.buttonFlexBox]}>
-          					<Text style={styles.labelText}>{`Aa | Texto                      >`}</Text>
-        				</View>
-      			</View>
-      			<View style={[styles.button1, styles.buttonFlexBox]}>
-        				<View style={[styles.stateLayer, styles.buttonFlexBox]}>
-          					<Text style={styles.labelText}>{`      | Contraste              >`}</Text>
-        				</View>
-      			</View>
-      			<View style={[styles.button2, styles.buttonFlexBox]}>
-        				<View style={[styles.stateLayer, styles.buttonFlexBox]}>
-          					<Text style={styles.labelText}>{`   i  | Sobre o app           >`}</Text>
-        				</View>
-      			</View>
-    		</View>);
+  return (
+    <View style={styles.iphone1314Configuraes}>
+      <Text style={styles.olSomosO}>{`olá, somos o MeEscuta! `}</Text>
+      <Text style={[styles.verso10, styles.verso10Typo]}>versão 1.0</Text>
+      <Image
+        style={styles.transparenteFundoBranco1Icon}
+        source={require("./assets/transparente-fundo-branco.png")}
+      />
+      <Text style={[styles.poweredBy, styles.verso10Typo]}>Powered by:</Text>
+      <View style={styles.logosContainer}>
+        <Image
+          style={styles.lipsFundoBranco1Icon}
+          resizeMode="center"
+          source={require("./assets/LIPS-Fundo_branco.png")}
+        />
+        <Image
+          style={styles.logoUfmg1Icon}
+          resizeMode="center"
+          source={require("./assets/Logo_UFMG.png")}
+        />
+      </View>
+    </View>
+  );
 };
 
+const { height } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
-  	buttonFlexBox: {
-    		justifyContent: "center",
-    		alignItems: "center"
-  	},
-  	labelText: {
-    		fontSize: 28,
-    		lineHeight: 36,
-    		fontFamily: "Roboto-Regular",
-    		color: "#fff",
-    		textAlign: "center"
-  	},
-  	stateLayer: {
-    		alignSelf: "stretch",
-    		backgroundColor: "#1b1b1b",
-    		flexDirection: "row",
-    		paddingHorizontal: 24,
-    		paddingVertical: 10,
-    		alignItems: "center",
-    		flex: 1
-  	},
-  	button: {
-    		top: 450,
-    		height: 56,
-    		width: 324,
-    		backgroundColor: "#green",
-    		borderRadius: 100,
-    		left: 33,
-    		position: "absolute",
-    		alignItems: "center",
-    		overflow: "hidden"
-  	},
-  	button1: {
-    		top: 520,
-    		height: 56,
-    		width: 324,
-    		backgroundColor: "#65558f",
-    		borderRadius: 100,
-    		left: 33,
-    		position: "absolute",
-    		alignItems: "center",
-    		overflow: "hidden"
-  	},
-  	button2: {
-    		top: 590,
-    		height: 56,
-    		width: 324,
-    		backgroundColor: "#65558f",
-    		borderRadius: 100,
-    		left: 33,
-    		position: "absolute",
-    		alignItems: "center",
-    		overflow: "hidden"
-  	},
-  	iphone1314Configuraes: {
-    		backgroundColor: "#fff",
-    		width: "100%",
-    		height: 844,
-    		overflow: "hidden",
-    		flex: 1
-  	}
+  verso10Typo: {
+    color: "rgba(0, 0, 0, 0.6)",
+    textAlign: "center",
+    fontSize: 12,
+    position: "absolute",
+  },
+  olSomosO: {
+    top: height * 0.60,
+    color: "#000",
+    textAlign: "center",
+    fontSize: 16,
+    fontFamily: "Inter-Regular",
+    position: "absolute",
+  },
+  verso10: {
+    top: height * 0.63,
+    fontFamily: "Inter-Regular",
+    color: "rgba(0, 0, 0, 0.6)",
+    position: "absolute",
+  },
+  transparenteFundoBranco1Icon: {
+    top: height * 0.07,
+    width: "90%",
+    height: height * 0.25,
+    position: "absolute",
+  },
+  poweredBy: {
+    top: height * 0.70,
+    fontWeight: "700",
+    fontFamily: "Inter-Bold",
+    position: "absolute",
+  },
+  logosContainer: {
+    top: height * 0.73,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "60%",
+    position: "absolute",
+  },
+  lipsFundoBranco1Icon: {
+    width: "45%",
+    height: height * 0.05,
+  },
+  logoUfmg1Icon: {
+    width: "45%",
+    height: height * 0.05,
+  },
+  iphone1314Configuraes: {
+    backgroundColor: "#fff",
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
 });
 
 export default IPhone1314Configuraes;

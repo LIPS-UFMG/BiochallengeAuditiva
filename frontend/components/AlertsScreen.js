@@ -45,16 +45,12 @@ const IPhone1314Dispositivos = () => {
           <View style={[styles.homeIndicator1, styles.homeLayout]} />
         </View>
       </View>
-      <Image
-        style={styles.transparenteFundoBranco1Icon}
-        
-        source="assets/transparente-fundo-branco.png"
-      />
+      <Image style={styles.transparenteFundoBranco1Icon} source={require('./assets/transparente-fundo-branco.png')} />
       <View style={[styles.buttonSecondary, styles.buttonSecondaryFlexBox]}>
         <Image
           style={styles.buttonSecondaryChild}
           resizeMode="cover"
-          source="Ellipse 6.png"
+          source={require('./assets/Ellipse.png')}
         />
         <Text
           style={[
@@ -238,6 +234,7 @@ const styles = StyleSheet.create({
     left: 46,
     elevation: 40,
     borderRadius: 150,
+    borderWidth: 2,
     width: 298,
     height: 57,
     flexDirection: "row",
@@ -249,7 +246,8 @@ const styles = StyleSheet.create({
       width: 0,
       height: -0.5,
     },
-    backgroundColor: "#37de00",
+    backgroundColor: "white",
+    borderColor: "#81b71a"
   },
   dispositivosConectados: {
     top: 225,
@@ -263,20 +261,20 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   iphone1314DispositivosChild: {
-    left: 20,
-    top: 300,
+    left: 10,
+    top: 290,
   },
   iphone1314DispositivosItem: {
-    top: 428,
-    left: 198,
+    top: 418,
+    left: 188,
   },
   iphone1314DispositivosInner: {
-    left: 198,
-    top: 300,
+    left: 188,
+    top: 290,
   },
   rectangleView: {
-    top: 505,
-    left: 22,
+    top: 495,
+    left: 12,
   },
   iphone1314Dispositivos: {
     flex: 1,
@@ -287,4 +285,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IPhone1314Dispositivos;
+export default IPhone1314Dispositivos

@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Dimensions,
 } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
@@ -241,15 +242,19 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    borderRadius: 30,
     width: "100%",
-    backgroundColor: "#ffc9b6",
-    padding: "5%",
+    backgroundColor: "#ffe1ad",
+    borderColor: "#ffb22c",
+    borderRadius: 30,
+    borderWidth: 2,
+    padding: 10,
   },
-  transcriptionsList: {},
+  transcriptionsList: {
+    paddingBottom: 20,
+  },
   transcriptionBox: {
     backgroundColor: "transparent",
-    borderColor: "blue",
+    borderColor: "#ffb22c",
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
@@ -269,12 +274,11 @@ const styles = StyleSheet.create({
   },
   noTranscriptionText: {
     textAlign: "center",
-    color: "#ff8b63",
+    color: "#fcaa1b",
     fontStyle: "italic",
     fontSize: 16,
   },
   buttonsContainer: {
-    borderRadius: 30,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
@@ -297,7 +301,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF9800",
   },
   buttonText: {
-    fontFamily: "Montserrat",
     color: "#fff",
     textAlign: "center",
     fontSize: 16,
