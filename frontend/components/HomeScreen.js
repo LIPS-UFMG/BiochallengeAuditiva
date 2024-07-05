@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
-import 'regenerator-runtime/runtime'
+import "regenerator-runtime/runtime";
 
 const BACKEND_URL = "http://192.168.0.156:3000";
 
