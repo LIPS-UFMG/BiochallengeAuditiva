@@ -114,8 +114,8 @@ const HomeScreen = () => {
       ]);
 
       setTranscriptions((prevTranscriptions) => [
+        { text: transcription, analysis: analysisResult }, // Add new transcription at the top
         ...prevTranscriptions,
-        { text: transcription, analysis: analysisResult },
       ]);
 
       // Check the transcription for keywords and send the appropriate message to ESP32
@@ -200,26 +200,56 @@ const HomeScreen = () => {
     setTranscriptions([]);
   }
 
+  function getAnalysisTextColor(analysis) {
+    if (analysis.includes("bebe")) return "red";
+    if (analysis.includes("incendio")) return "blue";
+    if (analysis.includes("campainha")) return "orange";
+    return "black";
+  }
+
+  function getBoxBackgroundColor(analysis) {
+    if (analysis.includes("bebe")) return "#ffcccc"; // Light red
+    if (analysis.includes("incendio")) return "#cceeff"; // Light blue
+    if (analysis.includes("campainha")) return "#ffebcc"; // Light orange
+    return "white";
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <FlatList
           data={transcriptions}
-          renderItem={({ item }) => (
-            <View style={styles.transcriptionBox}>
-              <Text style={styles.transcriptionText}>{item.text}</Text>
-              {item.analysis && (
-                <Text style={styles.analysisText}>{item.analysis}</Text>
-              )}
+          renderItem={({ item, index }) => (
+            <View
+              style={[
+                styles.transcriptionBox,
+                index === 0 && styles.latestTranscriptionBox,
+                { backgroundColor: getBoxBackgroundColor(item.analysis) },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.analysisText,
+                  index === 0 && styles.latestAnalysisText,
+                ]}
+              >
+                {item.analysis || "-"}
+              </Text>
+              <Text
+                style={[
+                  styles.transcriptionText,
+                  index === 0 && styles.latestTranscriptionText,
+                  { color: getAnalysisTextColor(item.analysis) },
+                ]}
+              >
+                {item.text}
+              </Text>
             </View>
           )}
           keyExtractor={(item, index) => index.toString()}
-          ListEmptyComponent={
-            <Text style={styles.noTranscriptionText}>
-              Nenhuma transcrição disponível
-            </Text>
-          }
+          ListEmptyComponent={<Text style={styles.noTranscriptionText}>-</Text>}
           contentContainerStyle={styles.transcriptionsList}
+          inverted // Invert the FlatList to show newest items at the top
         />
       </View>
       <View style={styles.buttonsContainer}>
@@ -280,17 +310,28 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
   },
+  latestTranscriptionBox: {
+    padding: 15,
+    marginVertical: 10,
+  },
   transcriptionText: {
     color: "black",
     textAlign: "left",
     fontSize: 16,
     lineHeight: 22,
   },
+  latestTranscriptionText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   analysisText: {
-    color: "black",
+    color: "gray",
     textAlign: "left",
     fontSize: 14,
-    marginTop: 5,
+    marginBottom: 5,
+  },
+  latestAnalysisText: {
+    fontSize: 16,
   },
   noTranscriptionText: {
     textAlign: "center",
