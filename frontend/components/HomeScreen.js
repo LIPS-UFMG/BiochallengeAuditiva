@@ -10,7 +10,7 @@ import {
 import { Audio } from "expo-av";
 import axios from "axios";
 
-const BACKEND_URL = "http://192.168.0.128:3000";
+const BACKEND_URL = "exp://172.20.10.2:8081";
 
 const HomeScreen = () => {
   const [recording, setRecording] = React.useState(null);
