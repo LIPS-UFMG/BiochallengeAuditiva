@@ -31,7 +31,7 @@ export default function Navigation() {
             tabBarIcon: ({ focused }) => (
               <Image
                 source={require("./assets/icon-devices.png")}
-                style={{ width: 20, height: 15, opacity: focused ? 1 : 0.3 }}
+                style={{ width: 20, height: 20, opacity: focused ? 1 : 0.3 }}
               />
             ),
           }}

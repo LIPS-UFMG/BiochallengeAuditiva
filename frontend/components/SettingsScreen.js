@@ -4,7 +4,7 @@ import { Text, StyleSheet, Image, View, Dimensions } from "react-native";
 const IPhone1314Configuraes = () => {
   return (
     <View style={styles.iphone1314Configuraes}>
-      <Text style={styles.olSomosO}>{`olá, somos o MeEscuta! `}</Text>
+      <Text style={styles.olSomosO}>{`Olá, somos o MeEscuta! `}</Text>
       <Text style={[styles.verso10, styles.verso10Typo]}>versão 1.0</Text>
       <Image
         style={styles.transparenteFundoBranco1Icon}
@@ -37,22 +37,21 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   olSomosO: {
-    top: height * 0.60,
+    top: height * 0.05,
     color: "#000",
     textAlign: "center",
     fontSize: 16,
-    fontFamily: "Inter-Regular",
-    position: "absolute",
+     position: "absolute",
   },
   verso10: {
-    top: height * 0.63,
-    fontFamily: "Inter-Regular",
+    top: height * 0.83,
+    fontFamily: "Arial",
     color: "rgba(0, 0, 0, 0.6)",
     position: "absolute",
   },
   transparenteFundoBranco1Icon: {
-    top: height * 0.07,
-    width: "90%",
+    top: height * 0.27,
+    width: "100%",
     height: height * 0.25,
     position: "absolute",
   },

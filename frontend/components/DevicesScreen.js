@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
@@ -15,7 +14,6 @@ const STATUS_CHECK_INTERVAL = 5000; // Intervalo de verificação em milissegund
 const DevicesScreen = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [device, setDevice] = useState(null);
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusIntervalId, setStatusIntervalId] = useState(null);
 
@@ -83,24 +81,10 @@ const DevicesScreen = () => {
     }
   };
 
-  const sendMessage = async () => {
-    if (message.trim()) {
-      try {
-        const response = await axios.post(`${BACKEND_URL}/send`, { message });
-        console.log("Message sent successfully:", response.data);
-      } catch (error) {
-        console.error(
-          "Error sending message:",
-          error.response ? error.response.data : error.message
-        );
-      }
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.statusText}>
-        {isConnected ? `Conectado a: ${device}` : "Desconectado"}
+        {isConnected ? "Conectado a:\nEsp32 Bluetooth" : "Desconectado"}
       </Text>
       <TouchableOpacity
         style={[
@@ -118,19 +102,6 @@ const DevicesScreen = () => {
           </Text>
         )}
       </TouchableOpacity>
-      {isConnected && (
-        <View style={styles.messageContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite a mensagem"
-            value={message}
-            onChangeText={setMessage}
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-            <Text style={styles.buttonText}>Enviar</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 };
@@ -143,12 +114,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   statusText: {
+  textAlign: "center",
     fontSize: 18,
     marginBottom: 20,
   },
   button: {
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 35,
     alignItems: "center",
     width: "60%",
   },
@@ -162,26 +134,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  messageContainer: {
-    marginTop: 20,
-    width: "80%",
-    alignItems: "center",
-  },
-  input: {
-    width: "100%",
-    padding: 10,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  sendButton: {
-    backgroundColor: "#1E90FF",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    width: "100%",
   },
 });
 

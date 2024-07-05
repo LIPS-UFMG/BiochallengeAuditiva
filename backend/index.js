@@ -1,7 +1,6 @@
 import express from "express";
 import multer from "multer";
 import * as fs from "fs";
-import { unlinkSync } from "fs";
 import { exec } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,7 +13,7 @@ import noble from "noble-winrt"; // Biblioteca BLE
 const app = express();
 const port = 3000;
 
-let caracteristics;
+let characteristics;
 let connectedDevice = null;
 
 const DeviceUUID = "30aea40696aa"; // UUID do dispositivo ESP32 BLE (substituto do endereço MAC)
@@ -48,35 +47,10 @@ for (const name of Object.keys(nets)) {
 
 noble.on("stateChange", (state) => {
   if (state === "poweredOn") {
-    noble.startScanning([ServiceUUID], false);
+    console.log("BLE state powered on, ready to connect.");
   } else {
+    console.log("BLE state not powered on, stopping scanning.");
     noble.stopScanning();
-  }
-});
-
-noble.on("discover", (peripheral) => {
-  if (peripheral.uuid === DeviceUUID) {
-    noble.stopScanning();
-    peripheral.connect((error) => {
-      if (error) {
-        console.error("Connection error:", error);
-        return;
-      }
-      console.log(`Connected to device: ${peripheral.uuid}`);
-      connectedDevice = peripheral;
-
-      peripheral.discoverSomeServicesAndCharacteristics(
-        [ServiceUUID],
-        [CharacteristicUUID],
-        (err, services, characteristics) => {
-          if (err) {
-            console.error("Service discovery error:", err);
-            return;
-          }
-          caracteristics = characteristics;
-        }
-      );
-    });
   }
 });
 
@@ -89,8 +63,43 @@ app.get("/status", (req, res) => {
 
 app.post("/connect", (req, res) => {
   if (!connectedDevice) {
+    console.log("Starting BLE scan...");
     noble.startScanning([ServiceUUID], false);
-    res.json({ message: "Scanning for device..." });
+
+    const onDiscover = (peripheral) => {
+      if (peripheral.uuid === DeviceUUID) {
+        noble.stopScanning();
+        peripheral.connect((error) => {
+          if (error) {
+            console.error("Connection error:", error);
+            return res.status(500).json({ message: "Connection error." });
+          }
+          console.log(`Connected to device: ${peripheral.uuid}`);
+          connectedDevice = peripheral;
+
+          peripheral.discoverSomeServicesAndCharacteristics(
+            [ServiceUUID],
+            [CharacteristicUUID],
+            (err, services, characteristics) => {
+              if (err) {
+                console.error("Service discovery error:", err);
+                return res
+                  .status(500)
+                  .json({ message: "Service discovery error." });
+              }
+              characteristics = characteristics;
+              noble.removeListener("discover", onDiscover); // Remove listener after connecting
+              res.json({
+                message: "Connected successfully.",
+                device: peripheral.uuid,
+              });
+            }
+          );
+        });
+      }
+    };
+
+    noble.on("discover", onDiscover);
   } else {
     res.json({
       message: "Already connected.",
@@ -129,7 +138,7 @@ app.post("/send", (req, res) => {
     const messageBuffer = Buffer.from(message, "utf-8");
     console.log("Message to send:", message);
 
-    const customCharacteristic = caracteristics.find(
+    const customCharacteristic = characteristics.find(
       (char) => char.uuid === CharacteristicUUID
     );
 
