@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import axios from "axios";
 
-const BACKEND_URL = "http://192.168.0.156:3000";
+const BACKEND_URL = "http://172.20.10.5:3000";
 const STATUS_CHECK_INTERVAL = 5000; // Intervalo de verificação em milissegundos
 
 const DevicesScreen = () => {

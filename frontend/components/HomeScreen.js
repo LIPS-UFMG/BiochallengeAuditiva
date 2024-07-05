@@ -6,13 +6,13 @@ import {
   View,
   TouchableOpacity,
   FlatList,
-  Dimensions,
+  Vibration,
 } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
 import "regenerator-runtime";
 
-const BACKEND_URL = "http://192.168.0.156:3000";
+const BACKEND_URL = "http://172.20.10.5:3000";
 
 const HomeScreen = () => {
   const [recording, setRecording] = useState(null);
@@ -105,19 +105,30 @@ const HomeScreen = () => {
     const [currentAudio, ...remainingQueue] = audioQueue;
 
     try {
-      const transcriptionPromise = await transcribeAudio(currentAudio);
-      const analysisPromise = await analyzeAudio(currentAudio);
+      const transcriptionPromise = transcribeAudio(currentAudio);
+      const analysisPromise = analyzeAudio(currentAudio);
 
       const [transcription, analysisResult] = await Promise.all([
         transcriptionPromise,
         analysisPromise,
       ]);
 
-      if (transcription) {
-        setTranscriptions((prevTranscriptions) => [
-          ...prevTranscriptions,
-          { text: transcription, analysis: analysisResult },
-        ]);
+      setTranscriptions((prevTranscriptions) => [
+        ...prevTranscriptions,
+        { text: transcription, analysis: analysisResult },
+      ]);
+
+      // Check the transcription for keywords and send the appropriate message to ESP32
+
+      if (analysisResult.includes("campainha")) {
+        Vibration.vibrate(); // Faz o dispositivo vibrar
+        await sendMessageToESP32("4");
+      } else if (analysisResult.includes("sirene")) {
+        Vibration.vibrate(); // Faz o dispositivo vibrar
+        await sendMessageToESP32("3");
+      } else if (analysisResult.includes("bebe")) {
+        Vibration.vibrate(); // Faz o dispositivo vibrar
+        await sendMessageToESP32("2");
       }
     } catch (error) {
       console.error("Error processing audio queue:", error);
@@ -129,6 +140,15 @@ const HomeScreen = () => {
       }
       setAudioQueue(remainingQueue);
       setIsProcessing(false);
+    }
+  }
+
+  async function sendMessageToESP32(message) {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/send`, { message });
+      console.log("Message sent successfully:", response.data);
+    } catch (error) {
+      console.error("Error sending message to ESP32:", error);
     }
   }
 
