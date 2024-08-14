@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
   },
   verso10: {
     top: height * 0.83,
-    fontFamily: "Arial",
     color: "rgba(0, 0, 0, 0.6)",
     position: "absolute",
   },
@@ -58,7 +57,6 @@ const styles = StyleSheet.create({
   poweredBy: {
     top: height * 0.70,
     fontWeight: "700",
-    fontFamily: "Inter-Bold",
     position: "absolute",
   },
   logosContainer: {
